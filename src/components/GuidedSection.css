@@ -1,0 +1,256 @@
+.guided-section {
+  width: 100%;
+  height: 90vh;
+  background: #f7fafc;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-header {
+  background: white;
+  padding: 20px 48px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.section-header h1 {
+  font-size: 24px;
+  color: #1a202c;
+  margin: 0;
+}
+
+.section-subtitle {
+  font-size: 14px;
+  color: #718096;
+  margin: 4px 0 0 0;
+  font-weight: normal;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 16px;
+  font-weight: 500;
+  color: #2d3748;
+  margin-bottom: 8px;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-family: inherit;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.form-textarea {
+  resize: vertical;
+}
+
+.field-description {
+  font-size: 14px;
+  color: #718096;
+  margin-bottom: 24px;
+  font-style: italic;
+}
+
+.multi-shot-separator {
+  text-align: center;
+  margin: 1.5rem 0;
+  position: relative;
+}
+
+.multi-shot-separator::before,
+.multi-shot-separator::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.multi-shot-separator::before {
+  left: 0;
+}
+
+.multi-shot-separator::after {
+  right: 0;
+}
+
+.multi-shot-separator span {
+  background: #f7fafc;
+  padding: 0 1rem;
+  color: #718096;
+  font-size: 14px;
+  font-style: italic;
+}
+/* Container for the classification exercise in Step 1 */
+.prompt-classification-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between each prompt row */
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Styles for an individual prompt row */
+.prompt-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Styling for the prompt text itself */
+.prompt-text {
+    flex-grow: 1; /* Allows text to take up most of the space */
+    margin-right: 20px;
+    font-size: 1.05rem;
+    color: #333;
+}
+
+/* Styling for the dropdown select element */
+.quality-select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    min-width: 120px; /* Ensure it's wide enough for the text */
+    transition: border-color 0.2s ease;
+}
+
+.quality-select:focus {
+    border-color: #007bff; /* Focus color */
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Feedback text styles */
+.feedback {
+    margin-left: 15px;
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
+.correct-text {
+    color: #28a745; /* Green for success */
+}
+
+.incorrect-text {
+    color: #dc3545; /* Red for incorrect */
+}
+
+/* --- Step 2 Explanation Styles --- */
+
+.explanation-section {
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.explanation-section h3 {
+    margin-top: 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.explanation-section ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin-bottom: 15px;
+}
+
+.good-prompt-display,
+.medium-prompt-display,
+.bad-prompt-display {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    font-style: italic;
+    border-left: 5px solid;
+}
+
+.good-prompt-display {
+    background-color: #e6ffed; /* Light green */
+    border-left-color: #28a745;
+}
+
+.medium-prompt-display {
+    background-color: #fffbe6; /* Light yellow */
+    border-left-color: #ffc107;
+}
+
+.bad-prompt-display {
+    background-color: #ffebeb; /* Light red */
+    border-left-color: #dc3545;
+}
+
+.good-prompt-display p,
+.medium-prompt-display p,
+.bad-prompt-display p {
+    margin: 0;
+    font-style: normal;
+}
+/* Container for the color-coded guide box */
+.input-guide-box {
+    padding: 8px 15px;
+    border-radius: 6px 6px 0 0; /* Rounded top corners */
+    margin-bottom: -1px; /* Overlap slightly with the form-group for a cleaner line */
+    color: #fff; /* White text for contrast */
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Text inside the guide box */
+.guide-box-text {
+    margin: 0;
+}
+
+/* Green Box (Good) */
+.guide-box-good {
+    background-color: #28a745; /* Bootstrap Success Green */
+    border: 1px solid #1e7e34;
+}
+
+/* Yellow/Orange Box (Medium) */
+.guide-box-medium {
+    background-color: #ffc107; /* Bootstrap Warning Yellow */
+    color: #333; /* Darker text for contrast on yellow */
+    border: 1px solid #d39e00;
+}
+
+/* Red Box (Bad) */
+.guide-box-bad {
+    background-color: #dc3545; /* Bootstrap Danger Red */
+    border: 1px solid #bd2130;
+}
+
+/* Adjustments to the form-group/textarea for visual continuity */
+.form-group textarea.form-textarea {
+    /* Ensure the textarea aligns perfectly with the guide box */
+    border-top-left-radius: 0; 
+    border-top-right-radius: 0;
+    margin-top: 0;
+}

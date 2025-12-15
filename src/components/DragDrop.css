@@ -1,0 +1,109 @@
+.drag-drop-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.draggable-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.draggable-item {
+  padding: 1rem;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: move;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.draggable-item:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.draggable-item.dropped {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.drop-zone {
+  min-height: 150px;
+  padding: 1.5rem;
+  background: #f0fdf4;
+  border: 3px dashed #22c55e;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #16a34a;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.drop-zone:hover {
+  background: #dcfce7;
+  border-color: #16a34a;
+}
+
+.dropped-content {
+  width: 100%;
+}
+
+.dropped-content strong {
+  display: block;
+  font-size: 1.1rem;
+  color: #16a34a;
+  margin-bottom: 0.5rem;
+}
+
+.dropped-content p {
+  color: #374151;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.good-prompt-display {
+  padding: 1.5rem;
+  background: #f0fdf4;
+  border: 2px solid #22c55e;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.good-prompt-display p {
+  margin: 0;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.explanation-box {
+  padding: 1.5rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.explanation-box h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: #111827;
+}
+
+.explanation-box ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #374151;
+}
+
+.explanation-box li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
