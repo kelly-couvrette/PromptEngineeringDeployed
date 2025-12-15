@@ -8,6 +8,21 @@ interface AgreementScreenProps {
 
 export default function AgreementScreen({ onAgree }: AgreementScreenProps) {
   const [step, setStep] = useState(1)
+  // State for the password input
+  const [password, setPassword] = useState("")
+  // State for showing a password error message
+  const [passwordError, setPasswordError] = useState(false)
+
+  // Function to handle the click on the "Agree" button
+  const handleAgreeClick = () => {
+    // Check if the entered password matches the required password
+    if (password === "PS3!") {
+      setStep(2)
+      setPasswordError(false) // Clear any previous error
+    } else {
+      setPasswordError(true) // Set error if password is wrong
+    }
+  }
 
   return (
     <div className="agreement-screen">
@@ -33,7 +48,28 @@ export default function AgreementScreen({ onAgree }: AgreementScreenProps) {
               </p>
             </div>
 
-            <button className="agree-button" onClick={() => setStep(2)}>
+            {/* NEW: Password Input Field */}
+            <div className="password-input-container">
+              <label htmlFor="password">Enter Password</label>
+              <input
+                type="password" // Use type="password" to hide the input characters
+                id="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  if (passwordError) setPasswordError(false) // Clear error on change
+                }}
+                className="password-input"
+              />
+              {/* NEW: Password Error Message */}
+              {passwordError && (
+                <p className="password-error">
+                  Incorrect password. Please try again.
+                </p>
+              )}
+            </div>
+
+            <button className="agree-button" onClick={handleAgreeClick}>
               Agree
             </button>
           </>
