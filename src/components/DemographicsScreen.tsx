@@ -69,6 +69,8 @@ export default function DemographicsScreen({ onComplete }: DemographicsScreenPro
   const [step, setStep] = useState(0)
   const q = questions[step]
 
+  const progressPercent = ((step) / questions.length) * 100
+
   const updateAnswer = (value: string) => {
     setAnswers((prev) => ({ ...prev, [q.id]: value }))
   }
@@ -93,6 +95,17 @@ export default function DemographicsScreen({ onComplete }: DemographicsScreenPro
   return (
     <div className="demographics-screen">
       <div className="demographics-content">
+        <div className="progress-container">
+          <div className="progress-text">
+            Question {step + 1} of {questions.length}
+          </div>
+          <div className="progress-bar-background">
+            <div 
+              className="progress-bar-fill" 
+              style={{ width: `${progressPercent}%` }}
+            ></div>
+          </div>
+        </div>
         <h1>Background Questions</h1>
         <p className="demographics-subtitle">
           Please answer the following questions about your experience
@@ -119,7 +132,7 @@ export default function DemographicsScreen({ onComplete }: DemographicsScreenPro
           {q.type === "textarea" && (
             <textarea
               className="demographics-select"
-              style={{ minHeight: "120px" }}
+              style={{ minHeight: "120px" , resize: "vertical"}}
               value={answers[q.id as keyof typeof answers]}
               onChange={(e) => updateAnswer(e.target.value)}
             />
