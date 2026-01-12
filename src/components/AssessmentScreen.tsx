@@ -132,7 +132,6 @@ export default function AssessmentScreen({ instruction, onComplete }: Assessment
         placeholder="User input goes here..."
         isTextArea 
         isTarget 
-        disabled // Ensure the component passes a disabled prop to the HTML element
     />
 </div>
             
