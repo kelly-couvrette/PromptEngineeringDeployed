@@ -123,18 +123,18 @@ export default function AssessmentScreen({ instruction, onComplete }: Assessment
           <div className="panel-content">
             {/* 🎯 TARGET INPUT 🎯 */}
             <div className="form-section-target">
-                <h3 className="section-title">
-                    {instructionContent2.sectionX}
-                </h3>
-                
-                {/* THE TARGET FIELD */}
-                <PlaceholderInput 
-                    label={instructionContent2.fieldZ} 
-                    placeholder="Enter text here..."
-                    isTextArea 
-                    isTarget 
-                />
-            </div>
+    <h3 className="section-title">
+        {instructionContent2.sectionX}
+    </h3>
+    
+    <PlaceholderInput 
+        label={instructionContent2.fieldZ} 
+        placeholder="User input goes here..."
+        isTextArea 
+        isTarget 
+        disabled // Ensure the component passes a disabled prop to the HTML element
+    />
+</div>
             
             <h2>Write an AI validation prompt for the above input field</h2>
             <textarea
