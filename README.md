@@ -22,3 +22,5 @@ npm run tauri dev
 
 npm run tauri build
 
+# if npm run deploy doesn't work: Run this from the project root
+npm run build; cd dist; git init; git add .; git commit -m "Manual Deploy"; git push -f [https://github.com/kelly-couvrette/PromptEngineeringDeployed.git](https://github.com/kelly-couvrette/PromptEngineeringDeployed.git) master:gh-pages; cd ..
