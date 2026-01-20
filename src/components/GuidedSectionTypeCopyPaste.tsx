@@ -70,30 +70,37 @@ export default function GuidedSectionTypeCopyPaste({ instruction, onComplete }: 
     }
   }
 
-  const handleNextStep = () => {
+const handleNextStep = () => {
     if (step === 1) {
       logStepTime(1); 
       setStep(2);
     } else if (step === 2) {
       logStepTime(2); 
       
-      // Construct the initial combined string for Step 3
-      const detailsCombined = details
+      // We generate this here just to populate the Step 3 box initially
+      const detailsText = details
         .map(d => d.value.trim())
         .filter(v => v.length > 0)
         .join("\n- ");
 
-      const combinedContent = `REQUIREMENTS:\n- ${detailsCombined}\n\nAI RESPONSE FORMATTING (SUCCESS):\n${fullExample}\n\nAI RESPONSE FORMATTING (MISSING):\n${missingExample}`;
+      const combinedContent = `REQUIREMENTS:\n- ${detailsText}\n\nAI RESPONSE FORMATTING (SUCCESS):\n${fullExample}\n\nAI RESPONSE FORMATTING (MISSING):\n${missingExample}`;
       
       setFinalEditableString(combinedContent);
       setStep(3);
     } else if (step === 3) {
       const step3Time = logStepTime(3); 
       
+      // RE-CALCULATE or define the string here so it's in scope for finalData
+      const detailsCombined = details
+        .map(d => d.value.trim())
+        .filter(v => v.length > 0)
+        .join(" & "); // Using " & " as per your original CSV requirement
+
       const finalData = {
-          combined_editable_content: finalEditableString,
-          ai_response_full_example: fullExample,
-          ai_response_missing_example: missingExample,
+          guided_details_combined: detailsCombined,      // Requirements from Step 1
+          ai_response_full_example: fullExample,         // Formatting from Step 2
+          ai_response_missing_example: missingExample,   // Formatting from Step 2
+          combined_editable_content: finalEditableString, // The big box from Step 3
           guided_step1_time: stepTimes.step1!,
           guided_step2_time: stepTimes.step2!,
           guided_step3_time: step3Time,
