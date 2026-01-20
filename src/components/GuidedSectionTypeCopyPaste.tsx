@@ -183,26 +183,26 @@ const handleNextStep = () => {
                 </p>
 
                 <div className="form-group">
-                  <label htmlFor="fullExample">Success Output Example</label>
+                  <label htmlFor="fullExample">Provide an example of how you would like the AI output to look when all of the content entered into this form field is accurate.</label>
                   <textarea
                     id="fullExample"
                     className="form-input textarea"
                     rows={5}
                     value={fullExample}
                     onChange={(e) => setFullExample(e.target.value)}
-                    placeholder="How the AI responds when everything is correct..."
+                    placeholder="e.g. 'VALID.'"
                   />
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="missingExample">Missing Info Output Example</label>
+                  <label htmlFor="missingExample">Provide an example of how you would like the AI output to look when some of the required information is missing.</label>
                   <textarea
                     id="missingExample"
                     className="form-input textarea"
                     rows={5}
                     value={missingExample}
                     onChange={(e) => setMissingExample(e.target.value)}
-                    placeholder="How the AI responds when info is missing..."
+                    placeholder="e.g. 'INVALID. Entry is missing... [detailed missing requirements].'"
                   />
                 </div>
 
