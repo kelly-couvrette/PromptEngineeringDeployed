@@ -6,320 +6,237 @@ import { getInstructionContent } from "../utils/instructions"
 import "./GuidedSection.css"
 
 interface Item { 
-  id: number; 
-  value: string;
+  id: number; 
+  value: string;
 }
 
 interface GuidedSectionTypeCopyPasteProps {
-  instruction: InstructionType
-  onComplete: (data: Record<string, string | number>) => void
+  instruction: InstructionType
+  onComplete: (data: Record<string, string | number>) => void
 }
 
 const initialDetails: Item[] = [
-  { id: 1, value: "" },
-  { id: 2, value: "" },
-  { id: 3, value: "" },
+  { id: 1, value: "" },
+  { id: 2, value: "" },
+  { id: 3, value: "" },
 ];
 
 export default function GuidedSectionTypeCopyPaste({ instruction, onComplete }: GuidedSectionTypeCopyPasteProps) {
-  const [step, setStep] = useState(1)
-  // State for dynamic details and the next available ID
-  const [details, setDetails] = useState<Item[]>(initialDetails)
-  const [detailIdCounter, setDetailIdCounter] = useState(4)
-  const [aggregateInput, setAggregateInput] = useState("")
-  const [heuristics, setHeuristics] = useState<Item[]>([{ id: 1, value: "" }]); // Step 2 content
-  const [heuristicIdCounter, setHeuristicIdCounter] = useState(2);  
-  // NEW state for Step 3: AI Response Formatting
-  const [fullExample, setFullExample] = useState("");
-  const [missingExample, setMissingExample] = useState("");
-const stepEntryTimeRef = useRef(Date.now());
-  // NEW: State to store the time spent on each step
-  const [stepTimes, setStepTimes] = useState<{ step1: number | null, step2: number | null, step3: number | null }>({
-    step1: null,
-    step2: null,
-    step3: null,
-  });
-useEffect(() => {
-    // Reset the timer when the step changes
-    stepEntryTimeRef.current = Date.now();
-  }, [step]);
-const logStepTime = (completedStep: 1 | 2 | 3) => {
-    const durationMs = Date.now() - stepEntryTimeRef.current;
-    const durationSeconds = Math.round(durationMs / 1000); // Round to nearest second
-    
-    setStepTimes(prev => ({
-      ...prev,
-      [`step${completedStep}`]: durationSeconds
-    }));
-    return durationSeconds; // Return for immediate use in final completion
-  };
+  const [step, setStep] = useState(1)
+  const [details, setDetails] = useState<Item[]>(initialDetails)
+  const [detailIdCounter, setDetailIdCounter] = useState(4)
+  const [fullExample, setFullExample] = useState("");
+  const [missingExample, setMissingExample] = useState("");
+  // Step 3 state: The final combined string that the user can edit
+  const [finalEditableString, setFinalEditableString] = useState("");
 
-  const handleDetailChange = (id: number, value: string) => {
-    setDetails((prevDetails) =>
-      prevDetails.map((detail) => (detail.id === id ? { ...detail, value } : detail))
-    )
-  }
-  const handleHeuristicChange = (id: number, value: string) => {
-    setHeuristics(prev =>
-      prev.map(h => h.id === id ? { ...h, value } : h)
-    );
-  };
+  const stepEntryTimeRef = useRef(Date.now());
+  const [stepTimes, setStepTimes] = useState<{ step1: number | null, step2: number | null, step3: number | null }>({
+    step1: null,
+    step2: null,
+    step3: null,
+  });
 
+  useEffect(() => {
+    stepEntryTimeRef.current = Date.now();
+  }, [step]);
 
-  const handleAddDetail = () => {
-    const newId = detailIdCounter
-    setDetailIdCounter((prev) => prev + 1)
-    setDetails((prevDetails) => [...prevDetails, { id: newId, value: "" }])
-  }
-  const handleAddHeuristic = () => {
-    const newId = heuristicIdCounter;
-    setHeuristicIdCounter(prev => prev + 1);
-    setHeuristics(prev => [...prev, { id: newId, value: "" }]);
-  };
+  const logStepTime = (completedStep: 1 | 2 | 3) => {
+    const durationMs = Date.now() - stepEntryTimeRef.current;
+    const durationSeconds = Math.round(durationMs / 1000);
+    
+    setStepTimes(prev => ({
+      ...prev,
+      [`step${completedStep}`]: durationSeconds
+    }));
+    return durationSeconds;
+  };
 
+  const handleDetailChange = (id: number, value: string) => {
+    setDetails((prevDetails) =>
+      prevDetails.map((detail) => (detail.id === id ? { ...detail, value } : detail))
+    )
+  }
 
-  const handleRemoveDetail = (id: number) => {
-    // Ensure we don't remove the last remaining detail
-    if (details.length > 1) {
-      setDetails((prevDetails) => prevDetails.filter((detail) => detail.id !== id))
-    }
-  }
-  const handleRemoveHeuristic = (id: number) => {
-    if (heuristics.length > 1) {
-      setHeuristics(prev => prev.filter(h => h.id !== id));
-    }
-  };
+  const handleAddDetail = () => {
+    const newId = detailIdCounter
+    setDetailIdCounter((prev) => prev + 1)
+    setDetails((prevDetails) => [...prevDetails, { id: newId, value: "" }])
+  }
 
-  
+  const handleRemoveDetail = (id: number) => {
+    if (details.length > 1) {
+      setDetails((prevDetails) => prevDetails.filter((detail) => detail.id !== id))
+    }
+  }
 
-  const handleNextStep = () => {
-    if (step === 1) {
-      // 1. LOG TIME
-      logStepTime(1); 
+const handleNextStep = () => {
+    if (step === 1) {
+      logStepTime(1); 
+      setStep(2);
+    } else if (step === 2) {
+      logStepTime(2); 
+      
+      // We generate this here just to populate the Step 3 box initially
+      const detailsText = details
+        .map(d => d.value.trim())
+        .filter(v => v.length > 0)
+        .join("\n- ");
 
-      // Aggregate existing details
-      const aggregate = details.map(d => d.value).join("\n");
-      setAggregateInput(aggregate);
+      const combinedContent = `REQUIREMENTS:\n- ${detailsText}\n\nAI RESPONSE FORMATTING (SUCCESS):\n${fullExample}\n\nAI RESPONSE FORMATTING (MISSING):\n${missingExample}`;
+      
+      setFinalEditableString(combinedContent);
+      setStep(3);
+    } else if (step === 3) {
+      const step3Time = logStepTime(3); 
+      
+      // RE-CALCULATE or define the string here so it's in scope for finalData
+      const detailsCombined = details
+        .map(d => d.value.trim())
+        .filter(v => v.length > 0)
+        .join(" & "); // Using " & " as per your original CSV requirement
 
-      // RESET heuristics for step 2
-      setHeuristics([{ id: 1, value: "" }]);
-      setHeuristicIdCounter(2);
+      const finalData = {
+          guided_details_combined: detailsCombined,      // Requirements from Step 1
+          ai_response_full_example: fullExample,         // Formatting from Step 2
+          ai_response_missing_example: missingExample,   // Formatting from Step 2
+          combined_editable_content: finalEditableString, // The big box from Step 3
+          guided_step1_time: stepTimes.step1!,
+          guided_step2_time: stepTimes.step2!,
+          guided_step3_time: step3Time,
+      };
 
-      setStep(2);
-    } else if (step === 2) {
-      // 1. LOG TIME
-      logStepTime(2); 
-      
-      // RESET examples for step 3
-      setFullExample("");
-      setMissingExample("");
+      onComplete(finalData as Record<string, string | number>);
+    }
+  }
 
-      setStep(3);
-    } else if (step === 3) {
-      // 1. LOG TIME & retrieve the final time for step 3
-      const step3Time = logStepTime(3); 
-      
-      // Consolidate text data
-      const detailsCombined = details
-            .map(d => d.value.trim())
-            .filter(v => v.length > 0)
-            .join(" & ");
+  const instructionContent = getInstructionContent(instruction)
+  const isStep1Valid = details.every(d => d.value.trim().length > 0)
+  const isStep2Valid = fullExample.trim().length > 0 && missingExample.trim().length > 0;
+  const isStep3Valid = finalEditableString.trim().length > 0;
 
-      const heuristicsCombined = heuristics
-            .map(h => h.value.trim())
-            .filter(v => v.length > 0)
-            .join(" & ");
+  return (
+    <div className="guided-section">
+      <div className="section-header">
+        <h1>Copy & Paste Exercise - Step {step} of 3</h1>
+        <p className="section-subtitle">Learn how to include important information</p>
+      </div>
 
-      // We must pass ALL data needed for App.tsx to save the CSV, 
-      // including the three step times from the stepTimes state + the final step 3 time.
-      const finalData = {
-          // Data fields
-          guided_details_combined: detailsCombined,
-          guided_heuristics_combined: heuristicsCombined,
-          guided_aggregate_prompt: aggregateInput,
-          ai_response_full_example: fullExample,
-          ai_response_missing_example: missingExample,
-          // NEW Time fields. We use stepTimes for step 1 & 2 (which are set by logStepTime)
-          // and step3Time for step 3 (for immediate use)
-          guided_step1_time: stepTimes.step1!, // Use ! as we assume they are set by now
-          guided_step2_time: stepTimes.step2!,
-          guided_step3_time: step3Time,
-      };
+      <div className="split-panel">
+        <div className="left-panel">
+          <div className="panel-content">
+            <h2>{instructionContent.title}</h2>
+            <div className="instruction-text">{instructionContent.content}</div>
+          </div>
+        </div>
 
-      // Pass the simplified data back to App.tsx
-      onComplete(finalData as Record<string, string | number>);
+        <div className="right-panel">
+          <div className="panel-content">
+            {step === 1 && (
+              <>
+                <h2>Extract Key Information</h2>
+                <p className="field-description">
+                  Refer to the instructions on the left and extract the requirements for the {instructionContent.requirement} input field.
+                </p>
 
-    }
-  }
+                {details.map((detail, index) => (
+                  <div key={detail.id} className="form-group detail-input-group">
+                    <label htmlFor={`detail-${detail.id}`}>Requirement {index + 1}</label>
+                    <div className="input-with-remove">
+                      <input
+                        id={`detail-${detail.id}`}
+                        type="text"
+                        className="form-input"
+                        value={detail.value}
+                        onChange={(e) => handleDetailChange(detail.id, e.target.value)}
+                        placeholder={`Enter Requirement ${index + 1}...`}
+                      />
+                      {details.length > 1 && (
+                        <button 
+                          type="button" 
+                          className="remove-button" 
+                          onClick={() => handleRemoveDetail(detail.id)}
+                        >
+                          &times;
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
 
-  const instructionContent = getInstructionContent(instruction)
-  // Check if ALL currently visible detail fields are filled
-  const isStep1Valid = details.every(d => d.value.trim().length > 0)
-  const isStep2Valid = heuristics.every(d => d.value.trim().length > 0)
-  const isStep3Valid = fullExample.trim().length > 0 && missingExample.trim().length > 0;
+                <button type="button" className="add-button" onClick={handleAddDetail}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+                  Add Another Requirement
+                </button>
 
-  return (
-    <div className="guided-section">
-      <div className="section-header">
-        <h1>Copy & Paste Exercise - Step {step} of 3</h1>
-        <p className="section-subtitle">Learn how to include important information</p>
-      </div>
+                <button className="submit-button" onClick={handleNextStep} disabled={!isStep1Valid}>
+                  Next: AI Response Formatting
+                </button>
+              </>
+            )}
 
-      <div className="split-panel">
-        <div className="left-panel">
-          <div className="panel-content">
-            <h2>{instructionContent.title}</h2>
-            <div className="instruction-text">{instructionContent.content}</div>
-          </div>
-          {/* NOTE: Left panel shows the instructions, and remains constant */}
-        </div>
+            {step === 2 && (
+              <>
+                <h2>AI Response Formatting</h2>
+                <p className="field-description">
+                  Provide examples of how the AI should format its final output based on the input data.
+                </p>
 
-        <div className="right-panel">
-          <div className="panel-content">
-            {step === 1 && (
-              <>
-                <h2>Extract Key Information</h2>
-                <p className="field-description">
-                  Refer to the instructions on the left and extract the requirements for the {instructionContent.requirement} input field.
-                </p>
+                <div className="form-group">
+                  <label htmlFor="fullExample">Success Output Example</label>
+                  <textarea
+                    id="fullExample"
+                    className="form-input textarea"
+                    rows={5}
+                    value={fullExample}
+                    onChange={(e) => setFullExample(e.target.value)}
+                    placeholder="How the AI responds when everything is correct..."
+                  />
+                </div>
 
-                {details.map((detail, index) => (
-                  <div key={detail.id} className="form-group detail-input-group">
-                    <label htmlFor={`detail-${detail.id}`}>Requirement {index + 1}</label>
-                    <div className="input-with-remove">
-                      <input
-                        id={`detail-${detail.id}`}
-                        type="text"
-                        className="form-input"
-                        value={detail.value}
-                        onChange={(e) => handleDetailChange(detail.id, e.target.value)}
-                        placeholder={`Enter Requirement ${index + 1}...`}
-                      />
-                      {details.length > 1 && (
-                        <button 
-                          type="button" 
-                          className="remove-button" 
-                          onClick={() => handleRemoveDetail(detail.id)}
-                          aria-label={`Remove detail ${index + 1}`}
-                        >
-                          &times;
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                <div className="form-group">
+                  <label htmlFor="missingExample">Missing Info Output Example</label>
+                  <textarea
+                    id="missingExample"
+                    className="form-input textarea"
+                    rows={5}
+                    value={missingExample}
+                    onChange={(e) => setMissingExample(e.target.value)}
+                    placeholder="How the AI responds when info is missing..."
+                  />
+                </div>
 
-                <button 
-                  type="button" 
-                  className="add-button" 
-                  onClick={handleAddDetail}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus">
-                    <path d="M5 12h14" /><path d="M12 5v14" />
-                  </svg>
-                  Add Another Requirement
-                </button>
+                <button className="submit-button" onClick={handleNextStep} disabled={!isStep2Valid}>
+                  Next: Review & Edit
+                </button>
+              </>
+            )}
 
-                <button className="submit-button" onClick={handleNextStep} disabled={!isStep1Valid}>
-                  Next: Add Instructions
-                </button>
-              </>
-            )}
+            {step === 3 && (
+              <>
+                <h2>Final Review</h2>
+                <p className="field-description">
+                  Review and refine your combined requirements and formatting instructions before finishing.
+                </p>
 
-            {step === 2 && (
-              <>
-                <h2>Additional Instructions</h2>
-                <p className="field-description">
-                    Beyond the requirements you extracted on the previous page, are there any additional instructions you would like to provide the AI regarding how you want the contents of that field to be evaluated and validated?
-                </p>
+                <div className="form-group">
+                  <textarea
+                    id="finalEditable"
+                    className="form-input textarea"
+                    style={{ minHeight: '300px', fontSize: '14px', lineHeight: '1.5' }}
+                    value={finalEditableString}
+                    onChange={(e) => setFinalEditableString(e.target.value)}
+                  />
+                </div>
 
-                {heuristics.map((heuristic, index) => (
-                    <div key={heuristic.id} className="form-group detail-input-group">
-                        <label htmlFor={`heuristic-${heuristic.id}`}>Additional Instruction {index + 1}</label>
-                        <div className="input-with-remove">
-                        <input
-                            id={`heuristic-${heuristic.id}`}
-                            type="text"
-                            className="form-input"
-                            value={heuristic.value}
-                            onChange={(e) => handleHeuristicChange(heuristic.id, e.target.value)}
-                            placeholder={`Enter Instruction ${index + 1}...`}
-                        />
-                        {heuristics.length > 1 && (
-                            <button
-                            type="button"
-                            className="remove-button"
-                            onClick={() => handleRemoveHeuristic(heuristic.id)}
-                            aria-label={`Remove Instruction ${index + 1}`}
-                            >
-                            &times;
-                            </button>
-                        )}
-                        </div>
-                    </div>
-                    ))}
-
-
-                <button 
-                  type="button" 
-                  className="add-button" 
-                  onClick={handleAddHeuristic}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus">
-                    <path d="M5 12h14" /><path d="M12 5v14" />
-                  </svg>
-                  Add Another Instruction
-                </button>
-
-                <button className="submit-button" onClick={handleNextStep} disabled={!isStep2Valid}>
-                  Next: AI Response Formatting
-                </button>
-              </>
-            )}
-
-            {step === 3 && (
-              <>
-                <h2>AI Response Formatting</h2>
-                <p className="field-description">
-                  Provide examples of how the AI should format its final output based on the input data.
-                </p>
-
-                <div className="form-group">
-                  <label htmlFor="fullExample">
-                    Provide an example of how you would like the AI output to look when all of the content entered into this form field is accurate.
-                  </label>
-                  <textarea
-                    id="fullExample"
-                    className="form-input textarea"
-                    rows={6}
-                    value={fullExample}
-                    onChange={(e) => setFullExample(e.target.value)}
-                    placeholder="Example of an AI response for a successful, compliant user input..."
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="missingExample">
-                    Provide an example of how you would like the AI output to look when some of the required information is missing.
-                  </label>
-                  <textarea
-                    id="missingExample"
-                    className="form-input textarea"
-                    rows={6}
-                    value={missingExample}
-                    onChange={(e) => setMissingExample(e.target.value)}
-                    placeholder="Example of an AI response for invalid user input with missing information..."
-                  />
-                </div>
-
-                <button className="submit-button" onClick={handleNextStep} disabled={!isStep3Valid}>
-                  Complete Exercise
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+                <button className="submit-button" onClick={handleNextStep} disabled={!isStep3Valid}>
+                  Complete Exercise
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }

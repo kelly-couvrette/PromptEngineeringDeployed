@@ -192,48 +192,49 @@ const scenarioIndex = getScenarioIndex(currentScreen);
     }));
     
     // 3. Check if all scenarios are complete
-    if (scenarioIndex === TOTAL_SCENARIOS - 1) {
+    // ... inside App.tsx where you process updatedScenarioResults
+if (scenarioIndex === TOTAL_SCENARIOS - 1) {
+    const flatDataForExport = {
+        'agreed': userData.agreed ? "Yes" : "No",
+        'experienceWithAI': userData.experienceWithAI,
+        'frequencyOfUse': userData.frequencyOfUse,
+        'promptConfidence': userData.promptConfidence,
+        'writingAbility': userData.writingAbility,
+        'usedModels': userData.usedModels,
         
-        // Create the flat object for CSV export
-        const flatDataForExport = {
-            'agreed': userData.agreed ? "Yes" : "No",
-            'experienceWithAI': userData.experienceWithAI,
-            'frequencyOfUse': userData.frequencyOfUse,
-            'promptConfidence': userData.promptConfidence,
-            'writingAbility': userData.writingAbility,
-            'usedModels': userData.usedModels,
-            // Flatten scenarios for CSV
-            ...updatedScenarioResults.reduce((acc, scenario, index) => {
-                const prefix = `SCENARIO_${index + 1}_`;
-                
-                // Demographic and Unguided Times
-                acc[`${prefix}INSTRUCTION`] = scenario.instruction;
-                acc[`${prefix}INSTRUCTION_TIME`] = scenario.instructionTime;
-                acc[`${prefix}UN_PROMPT`] = scenario.unguidedPrompt;
-                acc[`${prefix}UN_PROMPT_TIME`] = scenario.unguidedTime;
+        ...updatedScenarioResults.reduce((acc, scenario, index) => {
+            const prefix = `SCENARIO_${index + 1}_`;
+            const gData = scenario.guidedData; // This comes from your GuidedSection component
+            
+            // Core Scenario Info
+            acc[`${prefix}INSTRUCTION`] = scenario.instruction;
+            acc[`${prefix}INSTRUCTION_TIME`] = scenario.instructionTime;
+            acc[`${prefix}UN_PROMPT`] = scenario.unguidedPrompt;
+            acc[`${prefix}UN_PROMPT_TIME`] = scenario.unguidedTime;
 
-                // Guided Data (Note: guidedData now contains the step times)
-                const gData = scenario.guidedData as GuidedDataWithTimes;
-                
-                acc[`${prefix}G_DETAILS`] = gData.guided_details_combined;
-                acc[`${prefix}G_HEURISTICS`] = gData.guided_heuristics_combined;
-                acc[`${prefix}G_AI_FULL_EX`] = gData.ai_response_full_example;
-                acc[`${prefix}G_AI_MISS_EX`] = gData.ai_response_missing_example;
+            // Guided Step Data (Updated for your new flow)
+            // Step 1: The individual requirements joined by &
+            acc[`${prefix}G_DETAILS`] = gData.guided_details_combined; 
+            
+            // Step 2: The formatting examples
+            acc[`${prefix}G_AI_FULL_EX`] = gData.ai_response_full_example;
+            acc[`${prefix}G_AI_MISS_EX`] = gData.ai_response_missing_example;
 
-                // NEW GUIDED STEP TIME COLUMNS
-                acc[`${prefix}GUIDED_1_TIME`] = gData.guided_step1_time; 
-                acc[`${prefix}GUIDED_2_TIME`] = gData.guided_step2_time; 
-                acc[`${prefix}GUIDED_3_TIME`] = gData.guided_step3_time; 
+            // Step 3: The NEW big editable block
+            acc[`${prefix}G_FINAL_PROMPT`] = gData.combined_editable_content;
 
-                return acc;
-            }, {} as Record<string, any>),
-        };
+            // Step Timing
+            acc[`${prefix}GUIDED_1_TIME`] = gData.guided_step1_time; 
+            acc[`${prefix}GUIDED_2_TIME`] = gData.guided_step2_time; 
+            acc[`${prefix}GUIDED_3_TIME`] = gData.guided_step3_time; 
 
-        // Save the data
-        saveToCSV(flatDataForExport);
-        setCurrentScreen(14); // -> Thank You Screen
-        
-    } else {
+            return acc;
+        }, {} as Record<string, any>),
+    };
+
+    saveToCSV(flatDataForExport);
+    setCurrentScreen(14);
+} else {
         // ... (rest of the else block)
         setCurrentUnguidedPrompt(""); 
         handleNext(); 
