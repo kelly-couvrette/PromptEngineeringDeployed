@@ -83,7 +83,7 @@ const getInstructionContent2 = (type: InstructionType | string): InstructionDeta
     const data = instructionData[type as InstructionType] || defaultData;
     
     // 💡 RE-INCORPORATED THE FULL DYNAMIC DESCRIPTION LOGIC:
-    const dynamicDescription = `You are responsible for providing AI validation instructions for one of the text fields in the form on the right. Specifically, these instructions are for the open-ended text field within the **red box**. This field falls under the "**${data.sectionX}**" section of a **${data.title.toLowerCase().replace(' form', '').replace(' report', '')}**, the field is labeled as "**${data.fieldZ}**". The requirements for this section of the form are given on the following screen. Note that not all the instructions provided apply to this particular field (some instructions provide guidance for other fields of the form). You should provide validation instructions for the AI that focuses only on the "**${data.fieldZ}**" field.`;
+    const dynamicDescription = `You are responsible for providing AI validation instructions for one of the text fields in the form on the right. Specifically, these instructions are for the open-ended text field within the **to the right**. This field falls under the "**${data.sectionX}**" section of a **${data.title.toLowerCase().replace(' form', '').replace(' report', '')}**, the field is labeled as "**${data.fieldZ}**". The requirements for this section of the form are given on the following screen. Note that not all the instructions provided apply to this particular field (some instructions provide guidance for other fields of the form). You should provide validation instructions for the AI that focuses only on the "**${data.fieldZ}**" field.`;
     
     // Return the data structure with the dynamic description populated
     return { ...data, description: dynamicDescription };
@@ -98,7 +98,7 @@ interface AssessmentScreenProps {
 export default function AssessmentScreen({ instruction, onComplete }: AssessmentScreenProps) {
   // ... state and handlesubmit ...
   const [prompt, setPrompt] = useState("") 
-
+    const [showIntro, setShowIntro] = useState(true)
   const handleSubmit = () => {
     if (prompt.trim()) {
       onComplete(prompt)
@@ -109,45 +109,70 @@ export default function AssessmentScreen({ instruction, onComplete }: Assessment
   const instructionContent = getInstructionContent(instruction)
   const instructionContent2 = getInstructionContent2(instruction)
 
-  return (
-    <div className="assessment-screen">
-      <div className="split-panel"> 
-        
-        <div className="left-panel"> 
-          <div className="panel-content">
-            <h2>{instructionContent.title}</h2>
-<div className="instruction-text">{instructionContent.content}</div>
-</div>
-        </div>
-        <div className="right-panel">
-          <div className="panel-content">
-            {/* 🎯 TARGET INPUT 🎯 */}
-            <div className="form-section-target">
-    <h3 className="section-title">
-        {instructionContent2.sectionX}
-    </h3>
-    
-    <PlaceholderInput 
-        label={instructionContent2.fieldZ} 
-        placeholder="User input goes here..."
-        isTextArea 
-        isTarget 
-    />
-</div>
-            
-            <h2>Write an AI validation prompt for the above input field</h2>
-            <textarea
-              className="prompt-input"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Enter your AI validation prompt here..."
-            />
-            <button className="submit-button" onClick={handleSubmit} disabled={!prompt.trim()}>
-              Next
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+  if (showIntro) {
+    return (
+      <div className="demographics-screen">
+        <div className="demographics-content">
+          <h1>Method 1 - Unguided</h1>
+          
+          <p className="demographics-subtitle" style={{ marginBottom: '2rem' }}>
+            In this section, you will be asked to write an AI validation prompt for a specific form field. 
+            <strong> You will receive no step-by-step guidance</strong> for this task. 
+            Review the requirements and write the best prompt you can to ensure the user's input is valid.
+          </p>
+
+          <button 
+            className="next-button" 
+            onClick={() => setShowIntro(false)}
+          >
+            Start Task
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // 2. ACTUAL ASSESSMENT RENDER
+  return (
+    <div className="assessment-screen">
+      <div className="section-header">
+        <h1>Method 1 - Unguided Prompt Creation</h1>
+      </div>
+      <div className="split-panel"> 
+        <div className="left-panel"> 
+          <div className="panel-content">
+            <h2>{instructionContent.title}</h2>
+            <div className="instruction-text">{instructionContent.content}</div>
+          </div>
+        </div>
+        <div className="right-panel">
+          <div className="panel-content">
+            <div className="form-section-target">
+              <h3 className="section-title">
+                  {instructionContent2.sectionX}
+              </h3>
+              
+              <PlaceholderInput 
+                  label={instructionContent2.fieldZ} 
+                  placeholder="User input goes here..."
+                  isTextArea 
+                  isTarget 
+              />
+            </div>
+            
+            <h2>Write an AI validation prompt for the above input field</h2>
+            <textarea
+              className="prompt-input"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Enter your AI validation prompt here..."
+            />
+            <button className="submit-button" onClick={handleSubmit} disabled={!prompt.trim()}>
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }

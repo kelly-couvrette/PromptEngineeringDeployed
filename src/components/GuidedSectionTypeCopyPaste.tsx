@@ -23,6 +23,7 @@ const initialDetails: Item[] = [
 
 export default function GuidedSectionTypeCopyPaste({ instruction, onComplete }: GuidedSectionTypeCopyPasteProps) {
   const [step, setStep] = useState(1)
+  const [showIntro, setShowIntro] = useState(true); // Added for the intro screen
   const [details, setDetails] = useState<Item[]>(initialDetails)
   const [detailIdCounter, setDetailIdCounter] = useState(4)
   const [fullExample, setFullExample] = useState("");
@@ -75,19 +76,32 @@ const handleNextStep = () => {
       logStepTime(1); 
       setStep(2);
     } else if (step === 2) {
-      logStepTime(2); 
-      
-      // We generate this here just to populate the Step 3 box initially
-      const detailsText = details
-        .map(d => d.value.trim())
-        .filter(v => v.length > 0)
-        .join("\n- ");
+  logStepTime(2); 
 
-      const combinedContent = `REQUIREMENTS:\n- ${detailsText}\n\nAI RESPONSE FORMATTING (SUCCESS):\n${fullExample}\n\nAI RESPONSE FORMATTING (MISSING):\n${missingExample}`;
-      
-      setFinalEditableString(combinedContent);
-      setStep(3);
-    } else if (step === 3) {
+  // Format the list of requirements into a clean bulleted list
+  const detailsList = details
+    .map(d => d.value.trim())
+    .filter(v => v.length > 0)
+    .map(v => `- ${v}`) // Adds the bullet point here for consistency
+    .join("\n");
+
+  const combinedContent = `You are an AI assistant specialized in input validation. 
+
+Your task is to check if the following requirements are met:
+${detailsList}
+
+GUIDELINES:
+1. If ALL requirements are met, respond exactly with:
+${fullExample}
+
+2. If any requirements are missing, respond exactly with:
+${missingExample}
+
+Please analyze the input now.`;
+  
+  setFinalEditableString(combinedContent);
+  setStep(3);
+} else if (step === 3) {
       const step3Time = logStepTime(3); 
       
       // RE-CALCULATE or define the string here so it's in scope for finalData
@@ -114,12 +128,41 @@ const handleNextStep = () => {
   const isStep1Valid = details.every(d => d.value.trim().length > 0)
   const isStep2Valid = fullExample.trim().length > 0 && missingExample.trim().length > 0;
   const isStep3Valid = finalEditableString.trim().length > 0;
+if (showIntro) {
+    return (
+      <div className="demographics-screen">
+        <div className="demographics-content">
+          <h1>Method 2 - Guided</h1>
+          
+          <p className="demographics-subtitle" style={{ marginBottom: '2rem' }}>
+            In this section, you will be asked to write an AI validation prompt with 
+            <strong> step-by-step guidance</strong>. 
+          </p>
 
+          <div className="question-group">
+            <label>The Process</label>
+            <ul style={{ textAlign: 'left', fontSize: '14px', color: '#444', lineHeight: '1.8' }}>
+              <li><strong>Step 1:</strong> Extract individual requirements from the source text.</li>
+              <li><strong>Step 2:</strong> Define success and failure response formats.</li>
+              <li><strong>Step 3:</strong> Review and refine the automatically generated prompt.</li>
+            </ul>
+          </div>
+
+          <button 
+            className="next-button" 
+            onClick={() => setShowIntro(false)}
+          >
+            Start Guided Task
+          </button>
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="guided-section">
       <div className="section-header">
-        <h1>Copy & Paste Exercise - Step {step} of 3</h1>
-        <p className="section-subtitle">Learn how to include important information</p>
+        <h1>Method 2 - Guided Prompt Creation</h1>
+        <p className="section-subtitle">Step {step} of 3</p>
       </div>
 
       <div className="split-panel">

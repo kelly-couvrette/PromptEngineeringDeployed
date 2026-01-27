@@ -56,7 +56,7 @@ const getInstructionContent = (type: InstructionType | string): InstructionDetai
     const data = instructionData[type as InstructionType] || defaultData;
     
     // Construct the dynamic description text
-    const dynamicDescription = `You are responsible for providing AI validation instructions for one of the text fields in the form on the right. Specifically, these instructions are for the open-ended text field within the **red box**. This field falls under the "**${data.sectionX}**" section of a **${data.title.toLowerCase().replace(' form', '').replace(' report', '')}**, the field is labeled as "**${data.fieldZ}**". The requirements for this section of the form are given on the following screen. Note that not all the instructions provided apply to this particular field (some instructions provide guidance for other fields of the form). You should provide validation instructions for the AI that focuses only on the "**${data.fieldZ}**" field.`;
+    const dynamicDescription = `You are responsible for providing AI validation instructions for one of the text fields in the form on the right. Specifically, these instructions are for the open-ended text field within the **field to the right**. This field falls under the "**${data.sectionX}**" section of a **${data.title.toLowerCase().replace(' form', '').replace(' report', '')}**, the field is labeled as "**${data.fieldZ}**". The requirements for this section of the form are given on the following screen. Note that not all the instructions provided apply to this particular field (some instructions provide guidance for other fields of the form). You should provide validation instructions for the AI that focuses only on the "**${data.fieldZ}**" field.`;
     
     return { ...data, description: dynamicDescription };
 };
@@ -149,7 +149,7 @@ const InstructionIntroScreen: React.FC<InstructionIntroScreenProps> = ({ instruc
                         {data.title} Preview
                     </h2>
                     
-                    <div className="form-section form-section-identification">
+                    {/* <div className="form-section form-section-identification">
                         <h3 className="section-title">IDENTIFICATION</h3>
                         
                         <div className="grid grid-2-col">
@@ -158,7 +158,7 @@ const InstructionIntroScreen: React.FC<InstructionIntroScreenProps> = ({ instruc
                             <PlaceholderInput label="Phone" placeholder="(555) 555-5555" />
                             <PlaceholderInput label="Email" placeholder="user@example.com" />
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="form-section-target">
                         <h3 className="section-title">
