@@ -8,7 +8,7 @@ import GuidedSectionTypeCopyPaste from "./components/GuidedSectionTypeCopyPaste"
 // import GuidedSectionTypeDragDrop from "./components/GuidedSectionTypeDragDrop"
 import InstructionIntroScreen from "./components/InstructionIntroScreen"
 import type { UserData, InstructionType, GuidedSectionType } from "./types"
-import { saveToCSV } from "./utils/csvExport"
+import { saveToCloud } from "./utils/csvExport"
 
 // The new flow has 4 scenarios, each with 3 screens: Intro, Unguided, Guided.
 // Total non-intro/demographics screens: 4 scenarios * 3 screens/scenario = 12 screens
@@ -232,7 +232,7 @@ if (scenarioIndex === TOTAL_SCENARIOS - 1) {
         }, {} as Record<string, any>),
     };
 
-    saveToCSV(flatDataForExport);
+    saveToCloud(flatDataForExport);
     setCurrentScreen(14);
 } else {
         // ... (rest of the else block)
